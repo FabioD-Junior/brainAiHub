@@ -320,7 +320,7 @@ def final_response(message="",response="", prompt_type=0):
                 ]
     
     ## Connect to Cohere API
-    co = cohere.Client('M39PZ6DFdnm2mLYv7MvbIVbCbp8dYBsjnGyBP1BC')
+    co = cohere.Client('JAKSDJFjasjdfkjawoeijkljsdf78239470sdjfajdsfja')
 
     ## Use the Generation API to enhance our response
     generation = co.generate(
