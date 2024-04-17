@@ -5,9 +5,6 @@
 # Version : 3.0                                                                                          #
 # Source Code with adaptations and "downgrades" in order to be able to run on AWS free tier              #
 # Author : Fabio Duarte Junior - fabiojr@skiff.com                                                       #
-# Obs: Despite being a flask application, it runs in the master environment through Gunicorn and an Nginx# 
-# layer This version includes simulation endpoints. According to the consolidation of APIs carried out in#
-# the final project.
 #--------------------------------------------------------------------------------------------------------#
 
 ## Libs for the main simulation api
@@ -38,7 +35,7 @@ def login():
     username = request.headers.get('username')
     secret = request.headers.get('secret')
     if username and secret:
-        return jsonify(token='')## TODO : Implement API authentication using JWT from the main API.
+        return jsonify(token='eyJhbGciOiJIUd2VyIn0.NDFAApMqRBwacpLumnyC_p7IWWmmWEFmXJIVkRoIA-I')
     else:
         return {"message": "Wrong Credentials. Try Again"}, 400
 
@@ -48,7 +45,7 @@ def simulate():
     ## Autentication
     auth_header = request.headers.get('Authorization')
     token = auth_header.split(" ")[1] if auth_header and auth_header.startswith("Bearer ") else None
-    if not token or token != '<token>': ## TODO : Implement API authentication using JWT from the main API.
+    if not token or token != 'eyJhbGciOiJIUd2VyIn0.NDFAApMqRBwacpLumnyC_p7IWWmmWEFmXJIVkRoIA-I':
         return {"message": "Invalid or missing token"}, 401
 
     ## Parse JSON from POST request
@@ -97,10 +94,17 @@ def run_simulation(agent_path,agent_type,data_path,
     # All Tickers 
     if symbol =="Dow30":
         symbol =  ""
+        agent_path="agents/DOW30_TD3_high_C5_little.mdl"
+        agent_type="ddpg"         
+            
+    else:    
+        symbol = symbol.lower()
+        agent_path=f"agents/{symbol}_td3_high.mdl"
+        agent_type="td3"        
         
-    simulation_args =  {"agent_path"    : "agents/"+agent_path+".mdl",
+    simulation_args =  {"agent_path"    : agent_path,
                         "agent_type"    : agent_type,
-                        "data_path"     : data_path,
+                        "data_path"     : "data/trading_set.csv",
                         "trade_limit"   : trade_limit,
                         "initial_amount": str(initial_amount),
                         "start_date"    : start_date,
@@ -148,7 +152,7 @@ def ask():
     data = request.json
     user_message = data.get('userMessage') if data else None
     
-    if not token or token != 'eyJhbGciOiJIUd2VyIn0-I': ## TODO : Implement API authentication using JWT from the main API.
+    if not token or token != 'eyJhbGciOiJIUd2VyIn0.NDFAApMqRBwacpLumnyC_p7IWWmmWEFmXJIVkRoIA-I':
         return {"message": "Invalid or missing token"}, 401
 
     kb = pd.read_csv("kb_001.csv")
@@ -316,7 +320,7 @@ def final_response(message="",response="", prompt_type=0):
                 ]
     
     ## Connect to Cohere API
-    co = cohere.Client('<api key>')
+    co = cohere.Client('M39PZ6DFdnm2mLYv7MvbIVbCbp8dYBsjnGyBP1BC')
 
     ## Use the Generation API to enhance our response
     generation = co.generate(
